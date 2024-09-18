@@ -1,0 +1,11 @@
+# Read about fixtures at https://api.rubyonrails.org/classes/ActiveRecord/FixtureSet.html
+
+one:
+  album: one
+  music: one
+  track_number: 1
+
+two:
+  album: two
+  music: two
+  track_number: 1
