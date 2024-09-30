@@ -11,7 +11,7 @@
 
   <p>
     <strong>Band:</strong>
-    <%= album.band_id %>
+    <%= link_to album.band.name, band_path(album.band) %>
   </p>
 
 </div>

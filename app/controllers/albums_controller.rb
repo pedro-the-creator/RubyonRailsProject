@@ -1,5 +1,5 @@
 class AlbumsController < ApplicationController
-  before_action :set_album, only: %i[ show edit update destroy ]
+  before_action :set_album, only: %i[show edit update destroy]
 
   # GET /albums or /albums.json
   def index
@@ -22,7 +22,7 @@ class AlbumsController < ApplicationController
   # POST /albums or /albums.json
   def create
     @album = Album.new(album_params)
-
+    
     respond_to do |format|
       if @album.save
         format.html { redirect_to album_url(@album), notice: "Album was successfully created." }
@@ -58,13 +58,21 @@ class AlbumsController < ApplicationController
   end
 
   private
-    # Use callbacks to share common setup or constraints between actions.
-    def set_album
-      @album = Album.find(params[:id])
-    end
 
-    # Only allow a list of trusted parameters through.
-    def album_params
-      params.require(:album).permit(:name, :release_year, :band_id)
+  # Use callbacks to share common setup or constraints between actions.
+  def set_album
+    @album = Album.find(params[:id])
+  end
+
+  # Only allow a list of trusted parameters through.
+  def album_params
+    params_with_band_id = params.require(:album).permit(:name, :release_year, :band_id)
+    
+    if params_with_band_id[:band_id].is_a?(String) && !params_with_band_id[:band_id].match?(/^\d+$/)
+      band = Band.find_or_create_by(name: params_with_band_id[:band_id])
+      params_with_band_id[:band_id] = band.id
     end
+    
+    params_with_band_id
+  end
 end
