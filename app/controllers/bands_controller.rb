@@ -1,13 +1,32 @@
 class BandsController < ApplicationController
-  before_action :set_band, only: %i[ show edit update destroy ]
+  before_action :set_band, only: %i[show edit update destroy]
 
   # GET /bands or /bands.json
   def index
     @bands = Band.all
+
+    respond_to do |format|
+      format.html
+      format.pdf do
+        pdf = BandsIndexPdf.new(@bands)
+        send_data pdf.render, filename: "bands_list.pdf",
+                  type: 'application/pdf',
+                  disposition: 'inline'
+      end
+    end
   end
 
   # GET /bands/1 or /bands/1.json
   def show
+    respond_to do |format|
+      format.html
+      format.pdf do
+        pdf = BandPdf.new(@band)
+        send_data pdf.render, filename: "band_#{@band.id}.pdf",
+                  type: 'application/pdf',
+                  disposition: 'inline' # ou 'attachment' para download
+      end
+    end
   end
 
   # GET /bands/new

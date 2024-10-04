@@ -12,37 +12,40 @@ class AlbumsController < ApplicationController
 
   # GET /albums/new
   def new
-    @album = Album.new
+    @album_form = AlbumForm.new
   end
 
   # GET /albums/1/edit
   def edit
+    @album_form = AlbumForm.new(album: @album)
   end
 
   # POST /albums or /albums.json
   def create
-    @album = Album.new(album_params)
-    
+    @album_form = AlbumForm.new(album_form_params)
+
     respond_to do |format|
-      if @album.save
-        format.html { redirect_to album_url(@album), notice: "Album was successfully created." }
-        format.json { render :show, status: :created, location: @album }
+      if @album_form.save
+        format.html { redirect_to album_url(@album_form.album), notice: "Album was successfully created." }
+        format.json { render :show, status: :created, location: @album_form.album }
       else
         format.html { render :new, status: :unprocessable_entity }
-        format.json { render json: @album.errors, status: :unprocessable_entity }
+        format.json { render json: @album_form.errors, status: :unprocessable_entity }
       end
     end
   end
 
   # PATCH/PUT /albums/1 or /albums/1.json
   def update
+    @album_form = AlbumForm.new(album: @album, **album_form_params)
+
     respond_to do |format|
-      if @album.update(album_params)
+      if @album_form.save
         format.html { redirect_to album_url(@album), notice: "Album was successfully updated." }
         format.json { render :show, status: :ok, location: @album }
       else
         format.html { render :edit, status: :unprocessable_entity }
-        format.json { render json: @album.errors, status: :unprocessable_entity }
+        format.json { render json: @album_form.errors, status: :unprocessable_entity }
       end
     end
   end
@@ -64,15 +67,8 @@ class AlbumsController < ApplicationController
     @album = Album.find(params[:id])
   end
 
-  # Only allow a list of trusted parameters through.
-  def album_params
-    params_with_band_id = params.require(:album).permit(:name, :release_year, :band_id)
-    
-    if params_with_band_id[:band_id].is_a?(String) && !params_with_band_id[:band_id].match?(/^\d+$/)
-      band = Band.find_or_create_by(name: params_with_band_id[:band_id])
-      params_with_band_id[:band_id] = band.id
-    end
-    
-    params_with_band_id
+  # Permit only the form object parameters
+  def album_form_params
+    params.require(:album_form).permit(:album_name, :release_year, :band_name)
   end
 end
